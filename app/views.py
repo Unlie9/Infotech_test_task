@@ -13,7 +13,7 @@ def index(request):
 def booking(request):
     """
     GET: return all tables
-    GET+params: returns a list of available tables for a given date. "date": "01.07.2023T20:00"
+    GET + querry param: returns a list of available tables for a given date ± 2 hours. "date": "01.07.2023T20:00"
 
     POST: Create new booking
     """
