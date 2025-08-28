@@ -1,8 +1,14 @@
+import json
+
+from api.serializers import BookingCreateSerializer
+
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-
-from db.models import *
+from db.models import (
+    Table, 
+    Booking
+)
 
 
 def index(request):
@@ -17,16 +23,19 @@ def booking(request):
 
     POST: Create new booking
     """
+
     if request.method == "POST":
         """Create new booking"""
-        return JsonResponse(
-            {
-                "client_name": "Alex",
-                "client_phone": "0931234567",
-                "date": "29.06.2023T20:00",
-                "table": 2,
-            }
-        )
+        data = json.loads(request.body.decode("utf-8"))
+
+        booking_serializer = BookingCreateSerializer(data=data)
+        booking_serializer.is_valid(raise_exception=True)
+        booking_serializer.save()
+
+        return JsonResponse(booking_serializer.data, status=201)
+    
+    date = request.GET.get('date')
+
     return JsonResponse(
         {"tables": [{"id": i.id, "name": i.name} for i in Table.objects.all()]}
     )
