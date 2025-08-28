@@ -1,10 +1,9 @@
 import json
-
-from api.serializers import BookingCreateSerializer
-
+from rest_framework.exceptions import ValidationError
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from api.serializers import BookingCreateSerializer
 from db.models import (
     Table, 
     Booking
@@ -29,10 +28,13 @@ def booking(request):
         data = json.loads(request.body.decode("utf-8"))
 
         booking_serializer = BookingCreateSerializer(data=data)
-        booking_serializer.is_valid(raise_exception=True)
-        booking_serializer.save()
+        if booking_serializer.is_valid():
 
-        return JsonResponse(booking_serializer.data, status=201)
+          booking_serializer.save()
+          return JsonResponse(booking_serializer.data, status=201)
+
+        else:
+            return JsonResponse(booking_serializer.errors, status=409)
     
     date = request.GET.get('date')
 
