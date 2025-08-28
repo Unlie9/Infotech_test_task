@@ -5,10 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from app.utils import get_start_end_dates_for_filter_bookings
 from api.serializers import BookingCreateSerializer
-from db.models import (
-    Table, 
-    Booking
-)
+from db.models import Table
 
 
 def index(request):
@@ -29,12 +26,15 @@ def booking(request):
         data = json.loads(request.body.decode("utf-8"))
 
         booking_serializer = BookingCreateSerializer(data=data)
+  
         if booking_serializer.is_valid():
 
           booking_serializer.save()
           return JsonResponse(booking_serializer.data, status=201)
 
         else:
+            print(booking_serializer.errors)
+
             return JsonResponse(booking_serializer.errors, status=409)
     
     booking_date = request.GET.get('date')
@@ -49,7 +49,6 @@ def booking(request):
     available_tables = (
       available_tables
       .exclude(bookings__date__gte=start, bookings__date__lte=end)
-      .values("id", "name")
       .distinct()
     )
     

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from db.models import Table, Booking
+from db.models import Booking
 from app.utils import get_start_end_dates_for_filter_bookings
 
 

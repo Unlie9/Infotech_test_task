@@ -12,4 +12,3 @@ def get_start_end_dates_for_filter_bookings(
     end = date + datetime_obj.timedelta(hours=hours_diff)
 
     return start, end
-
