@@ -1,8 +1,9 @@
 import json
-from rest_framework.exceptions import ValidationError
+from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from app.utils import get_start_end_dates_for_filter_bookings
 from api.serializers import BookingCreateSerializer
 from db.models import (
     Table, 
@@ -36,8 +37,20 @@ def booking(request):
         else:
             return JsonResponse(booking_serializer.errors, status=409)
     
-    date = request.GET.get('date')
+    booking_date = request.GET.get('date')
+    available_tables = Table.objects.all().values('id', 'name')
+ 
+    if not booking_date:
+       return JsonResponse({"tables": list(available_tables)}, status=200)
 
-    return JsonResponse(
-        {"tables": [{"id": i.id, "name": i.name} for i in Table.objects.all()]}
+    booking_date_obj = datetime.strptime(booking_date, "%d.%m.%YT%H:%M")
+    start, end = get_start_end_dates_for_filter_bookings(date=booking_date_obj, hours_diff=1)
+
+    available_tables = (
+      available_tables
+      .exclude(bookings__date__gte=start, bookings__date__lte=end)
+      .values("id", "name")
+      .distinct()
     )
+    
+    return JsonResponse({"tables": list(available_tables)}, status=200)

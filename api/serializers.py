@@ -1,9 +1,7 @@
-from datetime import timedelta
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from db.models import Table, Booking
 from app.utils import get_start_end_dates_for_filter_bookings
-
 
 
 class BookingCreateSerializer(serializers.ModelSerializer):
@@ -33,13 +31,13 @@ class BookingCreateSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Booking
-        fields = (
-            'table',
-            'date',
-            'client_name',
-            'client_phone'
-        )
+      model = Booking
+      fields = (
+        'table',
+        'date',
+        'client_name',
+        'client_phone'
+      )
     
     def validate(self, data):
         self.validate_table_on_book_date(data)
